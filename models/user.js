@@ -11,6 +11,6 @@ const blogSchema = new Schema ({
     timestamps: true
 })
 
-const Blog = model('Blog', blogSchema)
+const User = model('User', userSchema)
 
-module.exports = Blog
+module.exports = User
