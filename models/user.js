@@ -14,6 +14,19 @@ const blogSchema = new Schema ({
     timestamps: true
 })
 
+userSchema.pre('save', async function(next) {
+    if (this.isModified('password')) {
+        this.password = await bcrypt.hash(this.password, 8)
+    }
+    next()
+})
+
+userSchema.methods.generateAuthToken = async function() {
+    const secretKey = process.env.JWT_SECRET
+    const token = jwt.sign({ _id: this._id }, secretKey)
+    return token
+}
+
 const User = model('User', userSchema)
 
 module.exports = User
