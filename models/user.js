@@ -1,4 +1,7 @@
+require('dotenv').config()
 const { model, Schema } = require('mongoose')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 
 const blogSchema = new Schema ({
