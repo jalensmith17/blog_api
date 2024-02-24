@@ -315,9 +315,9 @@ function SignUpForm(props) {
     }));
   };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h2", {
-    class: _SignUpForm_module_scss__WEBPACK_IMPORTED_MODULE_1__["default"].heading
+    className: _SignUpForm_module_scss__WEBPACK_IMPORTED_MODULE_1__["default"].heading
   }, "SIGN UP TO CHECK OUT MY BLOG"), /*#__PURE__*/React.createElement("form", {
-    class: _SignUpForm_module_scss__WEBPACK_IMPORTED_MODULE_1__["default"].form,
+    className: _SignUpForm_module_scss__WEBPACK_IMPORTED_MODULE_1__["default"].form,
     onSubmit: e => {
       e.preventDefault();
       props.signUp(credentials);
@@ -972,4 +972,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=App.d5e203bc1e1af0aba9c2f4624526171c.js.map
+//# sourceMappingURL=App.faf11909b961c578c248305bab1d521c.js.map
