@@ -6,8 +6,8 @@ const jwt = require('jsonwebtoken')
 exports.auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '')
-    const data = jwt.verify(token, process.env.SECRET)
-    const user = await User.findOne({ _id: data._id })
+    const payloadFromJWT = jwt.verify(token, process.env.JWT_SECRET)
+    const user = await User.findOne({ _id: payloadFromJWT._id })
     if (!user) {
       throw new Error()
     }
@@ -35,8 +35,10 @@ exports.loginUser = async (req, res) => {
     if (!user || !await bcrypt.compare(req.body.password, user.password)) {
       res.status(400).send('Invalid login credentials')
     } else {
+      // https://i.imgur.com/3quZxs4.png
+      // This is accomplishing step 2
       const token = await user.generateAuthToken()
-      res.json({ user, token })
+      res.json({ user, token }) // Sending the user and the token to the front-end
     }
   } catch(error){
     res.status(400).json({message: error.message})

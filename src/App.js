@@ -1,112 +1,188 @@
 import { useState, useEffect } from 'react'
-import TodoList from './components/TodoList/TodoList'
+import AuthPage from './pages/AuthPage/AuthPage'
+import HomePage from './pages/HomePage/HomePage'
+import ShowPage from './pages/ShowPage/ShowPage'
+import { Route, Routes } from 'react-router-dom'
 import styles from './App.module.scss'
 
-
 export default function App(){
-    const [todos, setTodos] = useState([])
-    const [completedTodos, setCompletedTodos] = useState([])
-    const [newTodo, setNewTodo] = useState({
-        title: '',
-        completed: false
-    })
+    const [user, setUser] = useState(null)
+    const [token, setToken] = useState('')
 
-    //createTodos
-    const createTodo = async () => {
-        const body = {...newTodo}
+    const signUp = async (credentials) => {
         try {
-            const response = await fetch('/api/todos', {
+           const response  =  await fetch('/api/userRouter', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credentials)
+           })
+           const data = await response.json()
+           setUser(data.user)
+           setToken(data.token)
+           localStorage.setItem('token', data.token)
+           localStorage.setItem('user', JSON.stringify(data.user))
+        } catch (error) {
+           console.error(error) 
+        }
+    }
+    // this function will need to be a prop passed to the LoginForm via AuthPage
+    const login = async (credentials) => {
+
+        try {
+        // https://i.imgur.com/3quZxs4.png
+        // Step 1 is complete here once someone fills out the loginForm
+        const response = await fetch('/api/userRouter/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify(credentials)
+        })
+        const data = await response.json()
+        // Step 3
+        const tokenData = data.token 
+        localStorage.setItem('token', tokenData)
+        setToken(tokenData)
+        // the below code is additional to the core features of authentication
+        // You need to decide what additional things you would like to accomplish when you
+        // set up your stuff
+        const userData = data.user
+        localStorage.setItem('user', JSON.stringify(userData))
+        setUser(userData)
+        } catch (error) {
+            console.error(error)
+        }    
+    }
+
+    // Create we need token authentication in order to verify that someone can make a blog
+    // Plus identify who is making the blog
+    const createBlog = async (blogData, token) => {
+        // https://i.imgur.com/3quZxs4.png
+        // Step 4
+        if(!token){
+            return
+        }
+        try {
+            const response = await fetch('/api/blogRouter', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(blogData)
             })
-            const createdTodo = await response.json()
-            const todosCopy = [createdTodo,...todos]
-            setTodos(todosCopy)
-            setNewTodo({
-                title: '',
-                completed: false
-            })
-        } catch (error) {   
-            console.error(error)
-        }
-    }
-    //deleteTodos
-    const deleteTodo = async (id) => {
-        try {
-            const index = completedTodos.findIndex((todo) => todo._id === id)
-            const completedTodosCopy = [...completedTodos]
-            const response = await fetch(`/api/todos/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            await response.json()
-            completedTodosCopy.splice(index, 1)
-            setCompletedTodos(completedTodosCopy)
+            const data = await response.json()
+            return data
         } catch (error) {
             console.error(error)
         }
+
     }
-    //moveToCompleted
-    const moveToCompleted = async (id) => {
+
+    // Read we don't need token authentication to see the blogPosts
+    const getAllBlogs = async () => {
         try {
-            const index = todos.findIndex((todo) => todo._id === id)
-            const todosCopy = [...todos]
-            const subject = todosCopy[index]
-            subject.completed = true 
-            const response = await fetch(`/api/todos/${id}`, {
+            const response = await fetch('/api/blogRouter')
+            const data = await response.json()
+            return data
+        } catch (error) {
+            console.error(error)
+        }
+    } 
+    const getIndividualBlog = async (id) => {
+        try {
+            const response = await fetch(`/api/blogRouter/${id}`)
+            const data = await response.json()
+            return data
+        } catch (error) {
+            console.error(error) 
+        }
+    }
+    // Update
+    const updateBlog = async (newBlogData, id, token) => {
+        // https://i.imgur.com/3quZxs4.png
+        // Step 4
+        if(!token){
+            return
+        }
+        try {
+            const response = await fetch(`/api/blogRouter/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(subject)
+                body: JSON.stringify(newBlogData)
             })
-            const updatedTodo = await response.json()
-            const completedTDsCopy = [updatedTodo, ...completedTodos]
-            setCompletedTodos(completedTDsCopy)
-            todosCopy.splice(index, 1)
-            setTodos(todosCopy)
+            const data = await response.json()
+            return data
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
+
+    // Delete
+    const deleteBlog = async (id, token) => {
+        // https://i.imgur.com/3quZxs4.png
+        // Step 4
+        if(!token){
+            return
+        }
+        try {
+            const response = await fetch(`/api/blogRouter/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            const data = await response.json()
+            return data
         } catch (error) {
             console.error(error)
         }
     }
-    //getTodos
-    const getTodos = async () => {
-        try{
-            const response = await fetch('/api/todos')
-            const foundTodos = await response.json()
-            setTodos(foundTodos.reverse())
-            console.log('hey')
-            const responseTwo = await fetch('/api/todos/completed')
-            const foundCompletedTodos = await responseTwo.json()
-            setCompletedTodos(foundCompletedTodos.reverse())
-        } catch(error){
-            console.error(error)
-        }
-    }
-    useEffect(() => {
-        getTodos()
-    }, [])
+
+
     return(
-        <>
-			
-            <div className={styles.banner}>
-                <h1>The World Famous Big Poppa Code React Starter Kit</h1>
-              <img src='https://i.imgur.com/5WXigZL.jpg'/>
-            </div>
-            <TodoList
-            newTodo={newTodo}
-            setNewTodo={setNewTodo}
-            createTodo={createTodo}
-            todos={todos}
-            moveToCompleted={moveToCompleted}
-            completedTodos={completedTodos}
-            deleteTodo={deleteTodo}
-            />
-        </>
+        <div className={styles.App}>
+            {/*
+               Get all Blog Posts when the component Mounts
+               Create an individual Blogs
+            */}
+            <Routes>
+                <Route path="/" 
+                element={
+                <HomePage 
+                    user={user} 
+                    token={token} 
+                    setToken={setToken}
+                    setUser={setUser}
+                    getAllBlogs={getAllBlogs}
+                    createBlog={createBlog}
+                />}></Route>
+                <Route path="/register" 
+                element={
+                <AuthPage 
+                    setUser={setUser} 
+                    setToken={setToken} 
+                    signUp={signUp}
+                    login={login}
+                />}></Route>
+                <Route path="/blog" 
+                element={
+                <ShowPage 
+                    user={user} 
+                    token={token} 
+                    setToken={setToken}
+                    getIndividualBlog={getIndividualBlog}
+                    deleteBlog={deleteBlog}
+                    updateBlog={updateBlog}
+                />}></Route>
+            </Routes>
+
+        </div>
     )
 }
