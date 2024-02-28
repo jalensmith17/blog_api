@@ -11,7 +11,7 @@ export default function App(){
 
     const signUp = async (credentials) => {
         try {
-           const response  =  await fetch('/api/userRouter', {
+           const response  =  await fetch('/api/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -33,7 +33,7 @@ export default function App(){
         try {
         // https://i.imgur.com/3quZxs4.png
         // Step 1 is complete here once someone fills out the loginForm
-        const response = await fetch('/api/userRouter/login', {
+        const response = await fetch('/api/users/login', {
             method: 'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -65,7 +65,7 @@ export default function App(){
             return
         }
         try {
-            const response = await fetch('/api/blogRouter', {
+            const response = await fetch('/api/blogs', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export default function App(){
     // Read we don't need token authentication to see the blogPosts
     const getAllBlogs = async () => {
         try {
-            const response = await fetch('/api/blogRouter')
+            const response = await fetch('/api/blogs')
             const data = await response.json()
             return data
         } catch (error) {
@@ -93,7 +93,7 @@ export default function App(){
     } 
     const getIndividualBlog = async (id) => {
         try {
-            const response = await fetch(`/api/blogRouter/${id}`)
+            const response = await fetch(`/api/blogs/${id}`)
             const data = await response.json()
             return data
         } catch (error) {
@@ -108,7 +108,7 @@ export default function App(){
             return
         }
         try {
-            const response = await fetch(`/api/blogRouter/${id}`, {
+            const response = await fetch(`/api/blogs/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ export default function App(){
             return
         }
         try {
-            const response = await fetch(`/api/blogRouter/${id}`, {
+            const response = await fetch(`/api/blogs/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -171,12 +171,13 @@ export default function App(){
                     signUp={signUp}
                     login={login}
                 />}></Route>
-                <Route path="/blog" 
+                <Route path="/blog/:id" 
                 element={
                 <ShowPage 
                     user={user} 
                     token={token} 
                     setToken={setToken}
+                    setUser={setUser}
                     getIndividualBlog={getIndividualBlog}
                     deleteBlog={deleteBlog}
                     updateBlog={updateBlog}

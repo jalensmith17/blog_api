@@ -13,22 +13,19 @@ export default function SignUpForm (props){
     }
     return(
         <>
-        <h2 className={styles.heading}>SIGN UP TO CHECK OUT MY BLOG</h2>
-        <form className={styles.form} onSubmit={(e) => {
-            e.preventDefault()
-            props.signUp(credentials)
-        }}>
-            <label htmlFor="name">Name:</label>
-                <input type="text" id="name" name="name" onChange={handleChange} value={credentials.name} />
+            <h2 className={styles.heading}>Sign Up For My Dope Blog Below</h2>
+            <form 
+                className={styles.form} 
+                onSubmit={(e) => {
+                e.preventDefault()
+                props.signUp(credentials)
+            }}>
+                <input type='text' name="name" onChange={handleChange} value={credentials.name} />
+                <input type='email' name="email" onChange={handleChange} value={credentials.email} />
+                <input type='password' name="password" onChange={handleChange} value={credentials.password} />
+                <input type="submit" value="Submit" />
+            </form>
 
-            <label htmlFor="email">Email:</label>
-                <input type="email" id="email" name="email" onChange={handleChange} value={credentials.email} />
-
-            <label htmlFor="password">Password:</label>
-                <input type="password" id="password" name="password" onChange={handleChange} value={credentials.password} />
-
-            <input type="submit" value="Submit" />
-        </form>
-        </> //grouping together
+        </>
     )
    } 
